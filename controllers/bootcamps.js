@@ -24,7 +24,7 @@ exports.getBootcamp = (req, res) => {
 exports.createBootcamp = (req, res) => {
   res.status(200).send({
     success: true,
-    msg: `Display bootcamp ${req.params.id}`
+    msg: `Create bootcamp`
   });
 };
 
