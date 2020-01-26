@@ -1,7 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const bootcamps = require('./routes/bootcamps');
-const logger = require('./middleware/logger');
 const morgan = require('morgan');
 
 dotenv.config({ path: './config/config.env' });
