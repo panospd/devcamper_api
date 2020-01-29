@@ -39,12 +39,12 @@ const schema = new mongoose.Schema({
   location: {
     type: {
       type: String,
-      enum: ['Point'],
-      required: true
+      enum: ['Point']
+      //required: true
     },
     coordinates: {
       type: [Number],
-      required: true,
+      //required: true,
       index: '2dsphere'
     },
     formattedAddress: String,
@@ -93,7 +93,7 @@ const schema = new mongoose.Schema({
     default: false
   },
   createdAt: {
-    type: date,
+    type: Date,
     default: Date.now
   }
 });
