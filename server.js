@@ -6,6 +6,7 @@ dotenv.config({ path: './config/config.env' });
 const bootcamps = require('./routes/bootcamps');
 const morgan = require('morgan');
 const colors = require('colors');
+
 const connectDb = require('./config/db');
 const errorHandler = require('./middleware/error');
 
