@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 
 const {
   getBootcamp,
@@ -7,19 +7,23 @@ const {
   updateBootcamp,
   deleteBootcamp,
   getBootcampsInRadius
-} = require('../controllers/bootcamps');
+} = require("../controllers/bootcamps");
+
+const courseRouter = require("./courses");
 
 const router = express.Router();
 
-router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius);
+router.use("/:bootcampId/courses", courseRouter);
+
+router.route("/radius/:zipcode/:distance").get(getBootcampsInRadius);
 
 router
-  .route('/')
+  .route("/")
   .get(getBootcamps)
   .post(createBootcamp);
 
 router
-  .route('/:id')
+  .route("/:id")
   .get(getBootcamp)
   .put(updateBootcamp)
   .delete(deleteBootcamp);
