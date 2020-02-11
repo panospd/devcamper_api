@@ -1,11 +1,12 @@
-const fs = require('fs');
-const mongoose = require('mongoose');
-const colors = require('colors');
-const dotenv = require('dotenv');
+const fs = require("fs");
+const mongoose = require("mongoose");
+const colors = require("colors");
+const dotenv = require("dotenv");
 
-dotenv.config({ path: './config/config.env' });
+dotenv.config({ path: "./config/config.env" });
 
-const Bootcamp = require('./models/Bootcamp');
+const Bootcamp = require("./models/Bootcamp");
+const Course = require("./models/Course");
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -15,14 +16,19 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 
 const bootcamps = JSON.parse(
-  fs.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/_data/bootcamps.json`, "utf-8")
+);
+
+const courses = JSON.parse(
+  fs.readFileSync(`${__dirname}/_data/courses.json`, "utf-8")
 );
 
 const importData = async () => {
   try {
     await Bootcamp.create(bootcamps);
+    await Course.create(courses);
 
-    console.log('Data imported...'.green.inverse);
+    console.log("Data imported...".green.inverse);
     process.exit();
   } catch (error) {
     console.error(error);
@@ -32,8 +38,9 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Bootcamp.deleteMany();
+    await Course.deleteMany();
 
-    console.log('Data destroyed...'.red.inverse);
+    console.log("Data destroyed...".red.inverse);
     process.exit();
   } catch (error) {
     console.error(error);
@@ -43,15 +50,15 @@ const deleteData = async () => {
 const optionFromInput = process.argv[2];
 
 if (!optionFromInput) {
-  console.log('Missing argument...');
+  console.log("Missing argument...");
   process.exit(1);
 }
 
-if (optionFromInput === '-i' || optionFromInput === '--import') {
+if (optionFromInput === "-i" || optionFromInput === "--import") {
   importData();
-} else if (optionFromInput === '-d' || optionFromInput === '--delete') {
+} else if (optionFromInput === "-d" || optionFromInput === "--delete") {
   deleteData();
 } else {
-  console.error('Not supported argument');
+  console.error("Not supported argument");
   process.exit(1);
 }
