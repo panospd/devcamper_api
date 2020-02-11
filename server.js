@@ -1,14 +1,16 @@
-const express = require('express');
+const express = require("express");
 
-const dotenv = require('dotenv');
-dotenv.config({ path: './config/config.env' });
+const dotenv = require("dotenv");
+dotenv.config({ path: "./config/config.env" });
 
-const bootcamps = require('./routes/bootcamps');
-const morgan = require('morgan');
-const colors = require('colors');
+const bootcamps = require("./routes/bootcamps");
+const courses = require("./routes/courses");
 
-const connectDb = require('./config/db');
-const errorHandler = require('./middleware/error');
+const morgan = require("morgan");
+const colors = require("colors");
+
+const connectDb = require("./config/db");
+const errorHandler = require("./middleware/error");
 
 connectDb();
 
@@ -16,9 +18,10 @@ const app = express();
 
 app.use(express.json());
 
-if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
-app.use('/api/v1/bootcamps', bootcamps);
+app.use("/api/v1/bootcamps", bootcamps);
+app.use("/api/v1/courses", courses);
 
 app.use(errorHandler);
 
@@ -31,7 +34,7 @@ const server = app.listen(PORT, () => {
   );
 });
 
-process.on('unhandledRejection', (error, promise) => {
+process.on("unhandledRejection", (error, promise) => {
   console.log(`Error: ${error.message}`.red);
   server.close(() => {
     process.exit(1);
