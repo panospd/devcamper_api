@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const schema = new mongoose.Schema({
+const CourseSchema = new mongoose.Schema({
   title: {
     type: String,
     trim: true,
@@ -38,4 +38,34 @@ const schema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("Course", schema);
+CourseSchema.statics.getAverageCost = async function(bootcampId) {
+  console.log("Calculating average cost".blue);
+  const obj = await this.aggregate([
+    {
+      $match: { bootcamp: bootcampId }
+    },
+    {
+      $group: { _id: "$bootcamp", averageCost: { $avg: "$tuition" } }
+    }
+  ]);
+
+  try {
+    await this.model("Bootcamp").findByIdAndUpdate(bootcampId, {
+      averageCost: Math.ceil(obj[0].averageCost / 10) * 10
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  console.log(obj);
+};
+
+CourseSchema.post("save", function() {
+  this.constructor.getAverageCost(this.bootcamp);
+});
+
+CourseSchema.pre("remove", function() {
+  this.constructor.getAverageCost(this.bootcamp);
+});
+
+module.exports = mongoose.model("Course", CourseSchema);
