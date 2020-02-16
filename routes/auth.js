@@ -8,12 +8,16 @@ const {
   login,
   getMe,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  updateDetails,
+  updatePassword
 } = require('../controllers/auth');
 
 router.post('/register', register);
 router.post('/login', login);
 router.get('/me', protect, getMe);
+router.put('/updateDetails', protect, updateDetails);
+router.put('/updatePassword', protect, updatePassword);
 router.post('/forgotPassword', forgotPassword);
 router.put('/resetpassword/:resettoken', resetPassword);
 
