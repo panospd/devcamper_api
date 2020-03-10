@@ -1,8 +1,8 @@
-const ErrorResponse = require('../utils/errorResponse');
-const crypto = require('crypto');
-const sendEmail = require('../utils/sendEmail');
-const User = require('../models/User');
-const asyncHandler = require('../middleware/async');
+const ErrorResponse = require("../utils/errorResponse");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
+const User = require("../models/User");
+const asyncHandler = require("../middleware/async");
 
 // @desc    Register user
 // @route   POST /api/v1/auth/register
@@ -28,16 +28,16 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   if (!email || !password)
     return next(
-      new ErrorResponse('Please provide an email and a password', 400)
+      new ErrorResponse("Please provide an email and a password", 400)
     );
 
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email }).select("+password");
 
-  if (!user) return next(new ErrorResponse('Invalid credentials', 401));
+  if (!user) return next(new ErrorResponse("Invalid credentials", 401));
 
   const isMatch = await user.matchPassword(password);
 
-  if (!isMatch) return next(new ErrorResponse('Invalid credentials', 401));
+  if (!isMatch) return next(new ErrorResponse("Invalid credentials", 401));
 
   sendTokenResponse(user, 200, res);
 });
@@ -46,12 +46,12 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/updatepassword
 // @access  Private
 exports.updatePassword = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id).select('+password');
+  const user = await User.findById(req.user.id).select("+password");
 
   const isMatchPassword = await user.matchPassword(req.body.currentPassword);
 
   if (!isMatchPassword)
-    return next(new ErrorResponse('Password is incorrect', 401));
+    return next(new ErrorResponse("Password is incorrect", 401));
 
   user.password = req.body.newPassword;
 
@@ -82,6 +82,26 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Log user out / Clear cookie
+// @route   GET /api/v1/auth/logout
+// @access  Private
+exports.logout = asyncHandler(async (req, res, next) => {
+  const expiryDate = new Date();
+  expiryDate.setSeconds(expiryDate.getSeconds() + 10);
+
+  console.log(expiryDate);
+
+  res.cookie("token", "none", {
+    expires: expiryDate,
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: req.user
+  });
+});
+
 // @desc    Get current logged in user
 // @route   POST /api/v1/auth/me
 // @access  Private
@@ -99,14 +119,14 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user)
-    return next(new ErrorResponse('There is no user with that email', 404));
+    return next(new ErrorResponse("There is no user with that email", 404));
 
   const resetToken = user.getResetPasswordToken();
 
   await user.save({ validateBeforeSave: false });
 
   const resetUrl = `${req.protocol}://${req.get(
-    'host'
+    "host"
   )}/api/v1/auth/resetpassword/${resetToken}`;
 
   const message = `You are receving this email because you (or someone else) has requeted the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
@@ -114,13 +134,13 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: 'Password reset token',
+      subject: "Password reset token",
       message
     });
 
     res.status(200).json({
       success: true,
-      data: 'Email sent'
+      data: "Email sent"
     });
   } catch (error) {
     console.log(error);
@@ -129,7 +149,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
     await user.save({ validateBeforeSave: false });
 
-    return next(new ErrorResponse('Email could not be sent', 500));
+    return next(new ErrorResponse("Email could not be sent", 500));
   }
 });
 
@@ -138,16 +158,16 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
   const resetPasswordToken = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(req.params.resettoken)
-    .digest('hex');
+    .digest("hex");
 
   const user = await User.findOne({
     resetPasswordToken,
     resetPasswordExpire: { $gt: Date.now() }
   });
 
-  if (!user) return next(new ErrorResponse('Invalid token', 400));
+  if (!user) return next(new ErrorResponse("Invalid token", 400));
 
   user.password = req.body.password;
 
@@ -169,11 +189,11 @@ const sendTokenResponse = (user, statusCode, res) => {
     httpOnly: true
   };
 
-  if (process.env.NODE_ENV === 'production') options.secure = true;
+  if (process.env.NODE_ENV === "production") options.secure = true;
 
   res
     .status(statusCode)
-    .cookie('token', token, options)
+    .cookie("token", token, options)
     .json({
       success: true,
       token
